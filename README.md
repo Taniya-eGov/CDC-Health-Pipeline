@@ -349,9 +349,20 @@ docker volume ls | grep debezium-local
 ```
 
 
-These files were **copied** from `debezium-implementation/` and
-`Kafka-Postgres-Health-Analytics/`; the originals still exist. Two directories now
-hold the same content, so pick one as authoritative before editing further.
+**This repo is the single source of truth for the CDC pipeline.** All work
+happens here.
+
+These files were originally **copied** from `debezium-implementation/` and
+`Kafka-Postgres-Health-Analytics/`, which still contain their now-superseded
+originals. Do not edit those copies — changes there have no effect on anything
+this repo runs.
+
+Two stale paths in particular will silently mislead you:
+
+| Superseded path | Why it's a trap |
+|---|---|
+| `debezium-implementation/debezium-local/docker-compose.yml` | Still fully runnable, binds the **same** host port 8090, and mounts the **old** DAG folder — so edits made here would appear to do nothing. Marked `SUPERSEDED — DO NOT RUN` in its header |
+| `Kafka-Postgres-Health-Analytics/airflow_dags/dags/` | The old DAG copy that the above mounts |
 
 Where versions differed, the newer set won: `debezium-implementation/clickhouse/`
 held an earlier DDL layout (`02_bronze_tables.sql`, `04_silver_level_tables.sql`)
