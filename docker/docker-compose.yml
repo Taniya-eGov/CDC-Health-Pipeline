@@ -1,0 +1,117 @@
+# Explicit project name. Without it Compose derives one from this directory --
+# "local" -- which is both meaningless in `docker ps` and liable to collide with
+# any other project that happens to keep its compose file in a local/ folder.
+# It also prefixes the volume names, so changing it later orphans your data.
+name: cdc-health-pipeline
+
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: cdc-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: testdb
+    ports:
+      - "5435:5432"
+    command:
+      - postgres
+      - -c
+      - wal_level=logical
+      - -c
+      - max_wal_senders=10
+      - -c
+      - max_replication_slots=10
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  zookeeper:
+    image: quay.io/debezium/zookeeper:3.1
+    container_name: cdc-zookeeper
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: quay.io/debezium/kafka:3.1
+    container_name: cdc-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      ZOOKEEPER_CONNECT: zookeeper:2181
+
+  connect:
+    image: quay.io/debezium/connect:3.1
+    container_name: cdc-connect
+    depends_on:
+      - kafka
+      - postgres
+    ports:
+      - "8083:8083"
+    environment:
+      BOOTSTRAP_SERVERS: kafka:9092
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: connect_configs
+      OFFSET_STORAGE_TOPIC: connect_offsets
+      STATUS_STORAGE_TOPIC: connect_statuses
+      KEY_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
+      # The entrypoint only maps CONNECT_*-prefixed vars into worker properties.
+      # Without the prefix these are ignored and the worker default (true) wins,
+      # which wraps every event in a schema/payload envelope.
+      CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: "false"
+      CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
+      
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: cdc-clickhouse
+    depends_on:
+      - kafka
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      # Lets containers on the compose network reach the default user, which the
+      # base image restricts to loopback. See the file for details.
+      - ../03-clickhouse/users.d/z-default-user-networks.xml:/etc/clickhouse-server/users.d/z-default-user-networks.xml:ro
+
+  airflow:
+    # Airflow 3.x is required, not 2.x: raw_event_to_bronze_orchestrator.py
+    # imports `airflow.sdk`, which does not exist before 3.0. Matches the
+    # version pinned for local dev in airflow_dags/README.md.
+    image: apache/airflow:3.0.6
+    container_name: cdc-airflow
+    depends_on:
+      - clickhouse
+    ports:
+      # Host 8090, since 8081 is taken by the unrelated airflow-etl stack.
+      - "8090:8080"
+    environment:
+      # "standalone" runs api-server + scheduler + dag-processor + triggerer in
+      # one process on SQLite. Enough for local inspection of the DAG. Note
+      # SequentialExecutor was REMOVED in Airflow 3 -- do not set it.
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      # Required from Airflow 3.0: the api-server refuses to start without it
+      # ("The value api_auth/jwt_secret must be set!"). Any non-empty string
+      # works for local dev; generate a real one for anything shared.
+      AIRFLOW__API_AUTH__JWT_SECRET: "local-dev-not-a-real-secret"
+      # Speeds up seeing DAG edits in the UI (default is 30s).
+      AIRFLOW__DAG_PROCESSOR__MIN_FILE_PROCESS_INTERVAL: "10"
+      # clickhouse_utils.py imports clickhouse_connect at module level, so every
+      # DAG in the folder fails to parse without it. Local-dev convenience:
+      # reinstalls on each container start and needs network access.
+      _PIP_ADDITIONAL_REQUIREMENTS: clickhouse-connect==0.8.15
+    volumes:
+      - airflow_data:/opt/airflow
+      # Mounted read-only: Airflow only ever reads these, and it keeps
+      # __pycache__ out of the source tree.
+      - ../04-airflow/dags:/opt/airflow/dags:ro
+    command: standalone
+
+volumes:
+  postgres_data:
+  clickhouse_data:
+  airflow_data:

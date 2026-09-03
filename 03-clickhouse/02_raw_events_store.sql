@@ -1,0 +1,528 @@
+-- ============================================================================
+-- EVENT STORE (APPEND-ONLY, JSON-AS-STRING)
+-- ============================================================================
+-- Purpose: Store every incoming change event as an immutable JSON payload
+-- Rules:
+--   - MergeTree only (NO ReplacingMergeTree)
+--   - NO UPDATE, NO DELETE
+--   - Raw JSON stored as String -- no parsing at this layer
+-- ============================================================================
+
+-- ############################################################################
+-- HOUSEHOLD EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.household_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- HOUSEHOLD MEMBER EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.household_member_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- PROJECT TASK EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.project_task_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- TASK RESOURCE EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.task_resource_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- ADDRESS EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.address_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- PROJECT EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.project_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- PROJECT TARGET EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.project_target_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- PROJECT ADDRESS EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.project_address_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- PROJECT BENEFICIARY EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.project_beneficiary_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- PROJECT STAFF EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.project_staff_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- PROJECT FACILITY EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.project_facility_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- INDIVIDUAL EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.individual_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- STOCK EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.stock_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- STOCK RECONCILIATION EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.stock_reconciliation_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- FACILITY EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.facility_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- PRODUCT EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.product_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- PRODUCT VARIANT EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.product_variant_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- SERVICE EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.service_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+
+-- ############################################################################
+-- PGR SERVICE EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.pgr_service_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- PGR ADDRESS EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.pgr_address_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- ATTENDANCE REGISTER EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.attendance_register_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- ATTENDANCE STAFF EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.attendance_staff_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- ATTENDANCE ATTENDEE EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.attendance_attendee_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- ATTENDANCE LOG EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.attendance_log_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- EXPENSE BILL EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.expense_bill_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- EXPENSE PARTY EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.expense_party_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- EXPENSE BILLDETAIL EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.expense_billdetail_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- EXPENSE LINEITEM EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.expense_lineitem_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- REFERRAL EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.referral_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- SIDE EFFECT EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.side_effect_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- HF REFERRAL EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.hf_referral_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- INDIVIDUAL ADDRESS EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.individual_address_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- USER ACTION EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.user_action_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- SERVICE ATTRIBUTE VALUE EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.service_attribute_value_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- SERVICE DEFINITION EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.service_definition_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- MUSTER ROLL EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.muster_roll_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;
+
+-- ############################################################################
+-- ATTENDANCE SUMMARY EVENTS RAW
+-- ############################################################################
+CREATE TABLE IF NOT EXISTS analytics.attendance_summary_events_raw
+(
+    event_time DateTime64(3) DEFAULT now64(3),
+    id         UUID          DEFAULT generateUUIDv4(),
+    raw        String
+)
+ENGINE = MergeTree
+PARTITION BY toYYYYMM(event_time)
+ORDER BY (event_time, id)
+SETTINGS index_granularity = 8192;

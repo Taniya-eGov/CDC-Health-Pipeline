@@ -1,0 +1,27 @@
+<clickhouse>
+  <!--
+    The base image ships users.d/default-user.xml, which restricts the "default"
+    user to loopback only. Any container on the compose network (Airflow) is then
+    rejected with a misleading "Authentication failed: password is incorrect"
+    error, because ClickHouse does not disclose network restrictions.
+
+    This file widens the allowed networks to the Docker private range.
+    172.16.0.0/12 covers every default Docker bridge subnet (172.16 - 172.31), so
+    it keeps working if Compose reassigns the network a different subnet, while
+    still refusing connections from public addresses reaching the published port.
+
+    The "z-" filename prefix matters: users.d files are applied in alphabetical
+    order, so this must sort after default-user.xml to take effect.
+
+    Local development only - the default user has no password.
+  -->
+  <users>
+    <default>
+      <networks replace="replace">
+        <ip>::1</ip>
+        <ip>127.0.0.1</ip>
+        <ip>172.16.0.0/12</ip>
+      </networks>
+    </default>
+  </users>
+</clickhouse>

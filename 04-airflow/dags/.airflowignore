@@ -1,0 +1,12 @@
+# Directories holding importable modules, not DAG files.
+#
+# Airflow's safe-mode DAG discovery imports any .py file containing the string
+# "dag" or "airflow", and both packages below mention "DAG" in docstrings. That
+# makes Airflow import them standalone as DAG candidates, so any import error
+# inside them surfaces in the UI as a spurious DAG import error even though
+# neither defines a DAG.
+#
+# This only affects DAG *discovery* -- the modules stay importable from
+# raw_event_to_bronze_orchestrator.py as normal.
+config/
+processors/
